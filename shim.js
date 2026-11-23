@@ -132,7 +132,7 @@
   }
 
   /* Жаңа нұсқа шықса, бетті өзі жаңартады (телефондағы ескі кэшке қарамастан). */
-  const APP_V = 6;
+  const APP_V = 7;
   let lastCheck = 0;
   async function checkVersion() {
     if (Date.now() - lastCheck < 60000) return; lastCheck = Date.now();

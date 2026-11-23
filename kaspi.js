@@ -147,16 +147,18 @@
     async read(file) {
       sheet(`<div style="text-align:center;padding:30px 0"><b>Выписка оқылып жатыр…</b><div class="mu" style="margin-top:6px">${esc(file.name)}</div></div>`);
       try {
-        const lines = await pdfLines(file);
-        rawText = lines.join("\n");
-        const parsed = parse(lines);
-        if (!parsed.length) return failView("Бұл файлдан операциялар табылмады.");
-        rows = prepare(parsed).sort((a, b) => b.t - a.t);
-        renderList();
+        KASPI.fromLines(await pdfLines(file));
       } catch (e) {
         rawText = "";
         failView((e && e.message) || "Файлды ашу мүмкін болмады. Бұл Kaspi выпискасының PDF-і екенін тексер.");
       }
+    },
+    fromLines(lines) {
+      rawText = lines.join("\n");
+      const parsed = parse(lines);
+      if (!parsed.length) return failView("Бұл файлдан операциялар табылмады.");
+      rows = prepare(parsed).sort((a, b) => b.t - a.t);
+      renderList();
     },
     tog(i, v) { rows[i].on = v; renderList() },
     cat(i, v) { rows[i].cat = Number(v); rows[i].catChanged = true },
