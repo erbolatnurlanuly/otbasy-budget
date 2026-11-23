@@ -131,7 +131,21 @@
       .subscribe(st => { if (st === "SUBSCRIBED") { if (!first) loadAll(); first = false } });
   }
 
-  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && started) loadAll() });
+  /* Жаңа нұсқа шықса, бетті өзі жаңартады (телефондағы ескі кэшке қарамастан). */
+  const APP_V = 3;
+  let lastCheck = 0;
+  async function checkVersion() {
+    if (Date.now() - lastCheck < 60000) return; lastCheck = Date.now();
+    try {
+      const r = await fetch("version.json?t=" + Date.now(), { cache: "no-store" });
+      const v = (await r.json()).v;
+      const a = document.activeElement, typing = a && /INPUT|TEXTAREA|SELECT/.test(a.tagName);
+      if (v > APP_V && !typing) location.replace(location.pathname + "?v=" + v);
+    } catch (_) {}
+  }
+  checkVersion();
+
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") { checkVersion(); if (started) loadAll() } });
   window.addEventListener("online", () => { if (started) loadAll() });
 
   /* ---------- экрандар ---------- */
