@@ -50,7 +50,7 @@
     el.id = "qa";
     el.innerHTML = `<div class="qa-bg" onclick="QA.cancel()"></div>
       <div class="qa-sheet" role="dialog" aria-label="Шығын қосу">
-        <div class="mu" style="text-align:center">${o.src === "applepay" ? " Pay арқылы төленді" : "Жаңа шығын"}</div>
+        <div class="mu" style="text-align:center">${o.src === "applepay" ? "Apple Pay арқылы төленді" : "Жаңа шығын"}</div>
         <input id="qa_amt" class="qa-amt" type="number" inputmode="decimal" value="${amt || ""}" placeholder="Сома">
         <input id="qa_m" value="${esc(m)}" placeholder="Қайда (дүкен)" style="text-align:center">
         <div class="mu" style="margin:10px 0 6px">Санат ${g.learned ? "· <span class='pos'>бұрынғыдай</span>" : "· ұсыныс"}</div>
