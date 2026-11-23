@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Отбасылық бюджет</title>
+<meta name="description" content="Отбасылық бюджет: табыс, шығын, қарыз, тізім">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Бюджет">
+<meta name="theme-color" content="#f6f5f1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e0e0e" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="stylesheet" href="app.css?v=1">
+<style>
+html,body{-webkit-tap-highlight-color:transparent;overscroll-behavior-y:none}
+body{-webkit-text-size-adjust:100%}
+button:active{transform:scale(.97)}
+button:disabled{opacity:.5}
+.auth{max-width:420px;margin:8vh auto 0}
+.logo{width:72px;height:72px;margin:0 auto;border-radius:18px;background:linear-gradient(150deg,#2a8c6b,#17614a);color:#fff;font-size:42px;font-weight:800;display:grid;place-items:center;box-shadow:0 6px 20px rgba(31,122,90,.3)}
+.seg{display:flex;background:var(--bg);border-radius:10px;padding:3px}
+.seg button{flex:1;background:transparent;color:var(--mu);padding:8px}
+.seg button.on{background:var(--card);color:var(--tx);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+#toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:#1d2b24;color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;max-width:90vw;text-align:center;z-index:9}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<main id="app"><p class="mu" style="text-align:center;margin-top:40vh">Жүктелуде…</p></main>
+<nav id="nav" style="display:none"></nav>
+<script src="supabase.js"></script>
+<script src="config.js?v=1"></script>
+<script src="app.js?v=1"></script>
+<script src="shim.js?v=1"></script>
+<script>
+if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+</script>
+</body>
+</html>
