@@ -238,7 +238,71 @@
       <div class="it" style="margin-top:6px"><div class="mu">Отбасы мүшелері</div>${MEMBERS.map(m => `<div>${m.user_id === UID ? "🟢" : "👤"} ${h(m.display_name || "—")}${m.user_id === UID ? ' <span class="mu">(сен)</span>' : ""}</div>`).join("")}</div>
       <div class="row sp it"><span><span class="mu">Отбасы коды</span><div style="font-size:22px;font-weight:800;letter-spacing:4px">${h(FAM.code)}</div></span><button class="g" onclick="AUTH.share()">Жіберу</button></div>
       ${MEMBERS.length < 2 ? `<div class="mu">Жұбайың қосымшаны ашып, тіркеліп, осы кодты жазса — бюджет ортақ болады.</div>` : ""}
-      <button class="x" style="width:100%;margin-top:6px" onclick="AUTH.out()">Аккаунттан шығу</button></div>`;
+      <button class="x" style="width:100%;margin-top:6px" onclick="AUTH.out()">Аккаунттан шығу</button></div>` + backupCard();
+  };
+
+  /* ---------- резервтік көшірме ---------- */
+  const LASTKEY = "budget-last-backup";
+  function lastBackup() { try { return Number(localStorage.getItem(LASTKEY)) || 0 } catch (_) { return 0 } }
+  const pad = n => String(n).padStart(2, "0");
+  const dmy = d => pad(d.getDate()) + "." + pad(d.getMonth() + 1) + "." + d.getFullYear();
+  const stampOf = d => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+
+  function backupCard() {
+    const t = lastBackup(), days = t ? Math.floor((Date.now() - t) / 864e5) : null;
+    const note = t ? `Соңғы көшірме: ${dmy(new Date(t))}${days >= 30 ? " · <b class=\"neg\">жаңасын жасайтын уақыт келді</b>" : ""}` : "Бұл құрылғыда әлі көшірме жасалмаған.";
+    return `<div class="card"><b>💾 Резервтік көшірме</b>
+      <p class="mu" style="margin:4px 0 10px">Деректер серверде сақталады. Қосымша қорғаныс үшін айына бір рет файлға сақтап қой.</p>
+      <button style="width:100%" onclick="BACKUP.json()">Толық көшірме (JSON)</button>
+      <div class="mu" style="font-size:12px;margin:4px 0 10px">Бәрі: табыс, шығын, қарыз, тізім, методика, жеке жазбаларың. Бұзылса, осы файлдан қалпына келтіріледі.</div>
+      <button class="g" style="width:100%" onclick="BACKUP.csv()">Excel кестесі (шығын мен кіріс)</button>
+      <div class="mu" style="font-size:12px;margin:4px 0 8px">Excel, Numbers немесе Google Sheets-те ашылады.</div>
+      <div class="mu" style="font-size:12px">${note}</div></div>`;
+  }
+
+  function rowsOf(priv, coll) { return [...map(K(priv, coll))].map(([id, data]) => ({ id, data })) }
+
+  function saveFile(name, type, text) {
+    const native = window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.saveFile;
+    try { localStorage.setItem(LASTKEY, String(Date.now())) } catch (_) {}
+    if (native) { native.postMessage({ name, text }); setTimeout(() => window.render && render(), 300); return }
+    const file = new File([text], name, { type });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({ files: [file], title: name }).catch(() => {});
+    } else {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(file); a.download = name;
+      document.body.appendChild(a); a.click();
+      setTimeout(() => { URL.revokeObjectURL(a.href); a.remove() }, 1500);
+      toast("Сақталды: " + name);
+    }
+    setTimeout(() => window.render && render(), 300);
+  }
+
+  window.BACKUP = {
+    json() {
+      const shared = [], priv = [];
+      Object.keys(store).forEach(k => {
+        const p = k.startsWith("p:"), coll = k.slice(2);
+        rowsOf(p, coll).forEach(r => (p ? priv : shared).push({ coll, id: r.id, data: r.data }));
+      });
+      const now = new Date();
+      const body = { app: "otbasy-budget", version: 1, exported_at: now.toISOString(), family_code: FAM.code,
+        members: MEMBERS.map(m => m.display_name || ""), shared, private: priv };
+      saveFile("budget-" + stampOf(now) + ".json", "application/json", JSON.stringify(body, null, 2));
+    },
+    csv() {
+      const q = v => { v = String(v == null ? "" : v); return /[";\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v };
+      const catName = i => { try { const c = cat(i); return c[0] + " " + c[1] } catch (_) { return "" } };
+      const when = t => { const d = new Date(t); return dmy(d) + " " + pad(d.getHours()) + ":" + pad(d.getMinutes()) };
+      const lines = [];
+      rowsOf(false, "expenses").forEach(r => lines.push({ t: r.data.t || 0, row: [when(r.data.t), "Шығын", catName(r.data.cat), -(r.data.amt || 0), r.data.note || "", r.data.cm || ""] }));
+      rowsOf(false, "inflow").forEach(r => lines.push({ t: r.data.t || 0, row: [when(r.data.t), "Кіріс", "", r.data.amt || 0, r.data.note || "", r.data.cm || ""] }));
+      lines.sort((a, b) => b.t - a.t);
+      const head = ["Күні", "Түрі", "Санат", "Сома ₸", "Атауы", "Пікір"];
+      const text = "﻿" + [head, ...lines.map(l => l.row)].map(r => r.map(q).join(";")).join("\r\n");
+      saveFile("budget-" + stampOf(new Date()) + ".csv", "text/csv", text);
+    }
   };
 
   /* ---------- іске қосу ---------- */

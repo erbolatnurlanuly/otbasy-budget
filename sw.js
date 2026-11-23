@@ -1,6 +1,6 @@
 // Қосымша файлдарын сақтайды: интернет болса — жаңасын алады, болмаса — сақталғанын көрсетеді.
-const CACHE = "budget-v1";
-const FILES = ["./", "index.html", "app.css?v=1", "app.js?v=1", "shim.js?v=1", "config.js?v=1", "supabase.js", "manifest.webmanifest", "icon-180.png", "icon-192.png"];
+const CACHE = "budget-v2";
+const FILES = ["./", "index.html", "app.css?v=2", "app.js?v=2", "shim.js?v=2", "config.js?v=2", "supabase.js", "manifest.webmanifest", "icon-180.png", "icon-192.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting())) });
 self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(k => Promise.all(k.filter(x => x !== CACHE).map(x => caches.delete(x)))).then(() => self.clients.claim())) });
 self.addEventListener("fetch", e => {
