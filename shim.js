@@ -132,7 +132,7 @@
   }
 
   /* Жаңа нұсқа шықса, бетті өзі жаңартады (телефондағы ескі кэшке қарамастан). */
-  const APP_V = 3;
+  const APP_V = 4;
   let lastCheck = 0;
   async function checkVersion() {
     if (Date.now() - lastCheck < 60000) return; lastCheck = Date.now();
@@ -274,6 +274,9 @@
       <div class="mu" style="font-size:12px">${note}</div></div>`;
   }
 
+  // Ортақ коллекцияны {кілт: дерек} түрінде оқу (quickadd.js дүкен жадысы үшін)
+  window.FDB_STORE = coll => { const o = {}; map(K(false, coll)).forEach((d, id) => { o[(d && d.k) || id] = d }); return o };
+
   function rowsOf(priv, coll) { return [...map(K(priv, coll))].map(([id, data]) => ({ id, data })) }
 
   function saveFile(name, type, text) {
@@ -339,6 +342,7 @@
       started = true;
       subscribe();
       init();
+      window.QUICKADD_READY && QUICKADD_READY();
     } catch (e) {
       console.error(e);
       shell(`<div class="auth"><div class="card"><b>Қосылу мүмкін болмады</b><p class="mu">${h(kz(e))}</p><button style="width:100%" onclick="location.reload()">Қайта көру</button></div></div>`);
