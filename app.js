@@ -72,7 +72,7 @@ function editBox(x){const k=x.k,id=x.id;
 function exp(){
   const m=S.exp.filter(x=>inPer(x.t)),mi=S.inf.filter(x=>inPer(x.t)),by=CATS.map((c,i)=>m.filter(x=>x.cat===i).reduce((s,x)=>s+x.amt,0)),tot=by.reduce((a,b)=>a+b,0),inc=mi.reduce((s,x)=>s+x.amt,0),out=S.mode==="out";
   const all=[...m.map(x=>({...x,k:"expenses"})),...mi.map(x=>({...x,k:"inflow"}))].sort((a,b)=>b.t-a.t);
-  return `<div class="pills">${PER.map(([k,n])=>`<button class="${(S.per||"month")===k?"":"g"}" onclick="S.per='${k}';render()">${n}</button>`).join("")}</div><div class="card">${donut(by.map((v,i)=>({v,c:COL[i%COL.length]})),"Жұмсалды",tot)}
+  return `<button class="g" style="width:100%;margin-bottom:12px" onclick="KASPI.pick()">📄 Kaspi выпискасын жүктеу</button><div class="pills">${PER.map(([k,n])=>`<button class="${(S.per||"month")===k?"":"g"}" onclick="S.per='${k}';render()">${n}</button>`).join("")}</div><div class="card">${donut(by.map((v,i)=>({v,c:COL[i%COL.length]})),"Жұмсалды",tot)}
   <div class="row sp it"><span>Кіріс</span><b class="pos">+${fmt(inc)}</b></div><div class="row sp it"><span>Шығын</span><b>${fmt(tot)}</b></div><div class="row sp it"><span>Айырма</span><b class="${inc-tot<0?"neg":"pos"}">${fmt(inc-tot)}</b></div></div>
   <div class="card"><div class="pills" style="margin-bottom:8px"><button class="${out?"":"g"}" onclick="setMode('out')">Шығын</button><button class="${out?"g":""}" onclick="setMode('in')">Кіріс</button></div>
   ${out?`<div class="chips">${CATS.map((c,i)=>`<button class="chip ${S.cat===i?"on":""}" onclick="pickCat(${i})">${c[0]}<br><small>${esc(c[1])}</small></button>`).join("")}</div>`:""}

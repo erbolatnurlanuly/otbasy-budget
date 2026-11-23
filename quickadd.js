@@ -96,6 +96,8 @@
     }
   };
 
+  window.QA_GUESS = guessFromMerchant;   // kaspi.js қолданады
+  window.QA_MKEY = mkey;
   window.QUICKADD = function (o) { pending = o || {}; tryShow() };
   window.QUICKADD_READY = tryShow;   // shim кіргеннен кейін шақырады
 
